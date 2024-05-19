@@ -59,7 +59,7 @@ namespace LFSR
 
         }
 
-        static BitArray Encript(BitArray code, byte[] key)
+        static BitArray Encrypt(BitArray code, byte[] key)
         {
             IList<BitArray> LFSRs = SetLFSR(key);
             BitArray cripted = new BitArray(code.Length);
@@ -79,21 +79,29 @@ namespace LFSR
         {
             Random rnd = new Random();
             byte[] rndBytes = new byte[16];
+
+
+            //Буферы для состояний сообщения
+            byte[] messageRnd = new byte[8];
+            byte[] cryptedM = new byte[8];
+            byte[] decryptedM = new byte[8];
+
+            //Генерация ключа
             rnd.NextBytes(rndBytes);
-            BitArray key = new BitArray(rndBytes);
-            
-            
-            IList<BitArray> LFSRs = SetLFSR(rndBytes);
-            BitArray bits = GetLFSRBits(LFSRs);
+            //Генерация сообщения
+            rnd.NextBytes(messageRnd);
 
-            BitArray message = new BitArray(new bool[] { true, false, false, true, false, true, false, false, true, true});
-            BitArray criptedMessage = Encript(message, rndBytes);
-            BitArray encriptedMessage = Encript(criptedMessage,rndBytes);
+            BitArray message = new BitArray(messageRnd);
+            //Шифрование
+            BitArray criptedMessage = Encrypt(message, rndBytes);
+            //Дешифрование
+            BitArray encriptedMessage = Encrypt(criptedMessage,rndBytes);
 
-
+            criptedMessage.CopyTo(cryptedM, 0);
+            encriptedMessage.CopyTo(decryptedM, 0);
 
             Console.Write("Переданное сообщение: ");
-            foreach(bool bit in message)
+            foreach(byte bit in messageRnd)
             {
                 Console.Write(bit + " ");
             }
@@ -101,7 +109,7 @@ namespace LFSR
 
 
             Console.Write("Зашифрованное сообщение: ");
-            foreach (bool bit in criptedMessage)
+            foreach (byte bit in cryptedM)
             {
                 Console.Write(bit + " ");
             }
@@ -109,7 +117,7 @@ namespace LFSR
             Console.WriteLine();
 
             Console.Write("Дешифрованное сообщение: ");
-            foreach (bool bit in encriptedMessage)
+            foreach (byte bit in decryptedM)
             {
                 Console.Write(bit + " ");
             }
